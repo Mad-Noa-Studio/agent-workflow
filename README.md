@@ -41,7 +41,7 @@ heurístico y revisa diff/snapshots; no certifica historial completo ni datos bi
 
 ## Instrucciones reutilizables
 
-Las cinco skills están en `.agents/skills/workflow-*`. El repositorio ya las descubre al trabajar aquí.
+Las cinco skills están en `.agents/skills/workflow-*`. Los clientes compatibles las descubren al trabajar aquí.
 Para otro proyecto enlaza cada carpeta dentro de su `.agents/skills/`, conservando el checkout origen
 para resolver las referencias a docs. También puedes leer cada SKILL.md como prompt en otro agente.
 Son instrucciones compatibles con roles genéricos; no inician otro modelo automáticamente.
@@ -64,3 +64,10 @@ node --test test/*.test.mjs
 Tests con Git temporal y datos ficticios, sin servicios de negocio. El aviso se prueba con respuestas
 simuladas. No se incluyen datos, bitácoras ni historias de ningún proyecto externo. Este repositorio
 usa development como rama base. Revisión independiente pendiente hasta que el otro rol la emita.
+
+## Licencia y contribuciones
+
+[MIT](LICENSE): permite usar, modificar y distribuir conservando sus avisos. Ver
+[contribuciones](CONTRIBUTING.md), [seguridad](SECURITY.md) y
+[revisión para publicación](docs/REVISION_PUBLICACION.md). El contenido es neutral; GitHub sigue
+mostrando la organización anfitriona y la actividad de las cuentas de plataforma.

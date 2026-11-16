@@ -66,6 +66,18 @@ class Avisos(unittest.TestCase):
                 self.assertNotIn('NO_PUBLICAR', out.getvalue())
                 self.assertIn('No se pudo consultar', out.getvalue())
 
+    def test_malformed_cache_does_not_break_delivery(self):
+        for cache in [{'checked': 'invalid', 'seen': []}, {'checked': 0, 'seen': [{}]}, []]:
+            with tempfile.TemporaryDirectory() as tmp, patch.object(aviso.Path, 'home', return_value=Path(tmp)):
+                key=aviso.hashlib.sha256(b'example/project:s1').hexdigest()
+                folder=Path(tmp)/'.cache/agent-workflow';folder.mkdir(parents=True)
+                (folder/(key+'.json')).write_text(json.dumps(cache))
+                with patch.object(aviso,'command',side_effect=['https://github.com/example/project.git',json.dumps([self.pr]),json.dumps({'workflow_runs':[self.run]})]):
+                    out=io.StringIO()
+                    with patch('sys.stdout',out):aviso.main(dict(cwd=tmp,session_id='s1'))
+                    self.assertIn('PR #2',out.getvalue())
+                    self.assertEqual((folder/(key+'.json')).stat().st_mode & 0o777,0o600)
+
     def test_install_preserves_settings_and_is_idempotent(self):
         install_spec = importlib.util.spec_from_file_location('installer', Path(__file__).resolve().parents[1] / 'scripts/instalar_aviso_ci.py')
         installer = importlib.util.module_from_spec(install_spec)
@@ -82,6 +94,19 @@ class Avisos(unittest.TestCase):
             self.assertEqual(len(result['hooks']['UserPromptSubmit']), 2)
             self.assertEqual(len(result['hooks']['SessionStart']), 1)
             self.assertTrue((Path(tmp)/'.local/share/agent-workflow/aviso_ci.py').exists())
+
+    def test_install_rejects_symlink_without_modifying_target(self):
+        loader=importlib.util.spec_from_file_location('installer',Path(__file__).resolve().parents[1]/'scripts/instalar_aviso_ci.py')
+        installer=importlib.util.module_from_spec(loader);loader.loader.exec_module(installer)
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp); project=root/'repo';project.mkdir()
+            subprocess.run(['git','init',str(project)],capture_output=True,check=True)
+            private=root/'private';private.mkdir();settings=private/'settings.local.json';settings.write_text('{}')
+            (project/'.claude').symlink_to(private,target_is_directory=True)
+            with patch.object(installer.Path,'home',return_value=root):
+                with self.assertRaises(ValueError):installer.install(project)
+            self.assertEqual(settings.read_text(),'{}')
+            self.assertFalse((root/'.local/share/agent-workflow/aviso_ci.py').exists())
 
 
 if __name__ == '__main__':

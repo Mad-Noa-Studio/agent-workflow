@@ -6,5 +6,25 @@
     "max_rondas_ci": 2,
     "max_lineas_pr": 400
   },
-  "features": []
+  "features": [
+    {
+      "id": "F-001",
+      "titulo": "Preparación segura para distribución pública",
+      "criterios": [
+        "Contenido e historial sin identidades privadas ni datos heredados",
+        "Licencia permisiva y guía de seguridad",
+        "Adaptadores seguros y CI con acciones fijadas por SHA"
+      ],
+      "verificacion": "Suite Node/Python, auditoría de blobs y logs, Gitleaks y CI",
+      "estado": "en_revision",
+      "pasa": true,
+      "autor": "agent-b",
+      "revisor": "",
+      "rama": "agent-b/F-001-publicacion-segura",
+      "pr": null,
+      "evidencia": [
+        "docs/REVISION_PUBLICACION.md"
+      ]
+    }
+  ]
 }

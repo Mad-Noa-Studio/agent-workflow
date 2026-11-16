@@ -125,3 +125,9 @@ un aviso; no certifica que falte revisión. El revisor comprueba estado actual a
 No ejecuta código de PR ni despierta clientes cerrados. No envía prompts ni publica comentarios.
 El adaptador SessionStart consulta estado/metodología. Son adaptadores optativos para clientes que
 implementen hookSpecificOutput/SessionStart/UserPromptSubmit, no un protocolo universal.
+
+### Endurecimiento compatible del paquete
+
+Los adaptadores opcionales conservan el protocolo; SessionStart usa el CLI de su instalación de
+confianza. Avisos CI escriben caché privada mediante temporal único y descartan estructuras inválidas.
+Acciones fijadas por SHA y guía de instalación segura; no cambia el formato del contrato 1.

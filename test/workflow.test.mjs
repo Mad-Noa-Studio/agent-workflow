@@ -302,3 +302,10 @@ test('todo informa revisión pendiente sin bloquear gates y SessionStart expone 
   const r=spawnSync('python3',[join(plugin,'scripts/sesion.py')],{cwd:tmpdir(),input:JSON.stringify({cwd:f.dir}),encoding:'utf8'});
   assert.equal(r.status,0);assert.match(r.stdout,/REVISIÓN PENDIENTE/);
 });
+test('SessionStart no ejecuta el CLI de un proyecto o PR inspeccionado', t => {
+  const f=fixture(t);
+  f.put('workflow/workflow.mjs', "import {writeFileSync} from 'node:fs'; writeFileSync('ejecucion-no-autorizada','x');\n");
+  const r=spawnSync('python3',[join(plugin,'scripts/sesion.py')],{cwd:f.dir,input:'{}',encoding:'utf8'});
+  assert.equal(r.status,0);assert.equal(existsSync(join(f.dir,'ejecucion-no-autorizada')),false);
+  assert.match(r.stdout,/Metodología/);
+});

@@ -7,6 +7,7 @@ import json
 import os
 import sys
 import subprocess
+from pathlib import Path
 
 FEATURES = os.path.join("workflow", "features.json")
 PROGRESS = os.path.join("workflow", "PROGRESO.md")
@@ -42,14 +43,14 @@ def main():
         if not isinstance(features, list) or not all(isinstance(f, dict) for f in features):
             raise ValueError("estructura de funciones inválida")
     except (OSError, ValueError):
-        msg = "Proyecto de la Workflow, pero workflow/features.json no se puede leer o tiene estructura inválida. Arreglarlo antes de seguir."
+        msg = "Proyecto con workflow/features.json ilegible o estructura inválida. Arreglarlo antes de seguir."
         print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": msg}}, ensure_ascii=False))
         return
     count = lambda st: sum(1 for f in features if f.get("estado") == st)
     current = [f for f in features if f.get("estado") in ("en_curso", "en_revision")]
     nxt = next((f for f in features if f.get("estado") == "pendiente"), None)
     lines = [
-        "Este proyecto sigue la Workflow (skill desarrollo-optimizado:metodologia).",
+        "Este proyecto usa el flujo definido en docs/METODOLOGIA.md y docs/CONTRATO.md.",
         f"Funciones: {count('hecha')} hechas, {len(current)} en curso o revisión, {count('pendiente')} pendientes, {count('bloqueada')} bloqueadas.",
     ]
     for f in current:
@@ -59,9 +60,11 @@ def main():
     progress = last_entries(PROGRESS)
     if progress:
         lines.append("Últimas entradas de workflow/PROGRESO.md:\n" + progress)
-    if os.path.isfile(os.path.join('workflow', 'workflow.mjs')):
+    # Ejecutar la herramienta del paquete instalado, no el código del proyecto/PR inspeccionado.
+    checker = Path(__file__).resolve().parents[1] / 'workflow' / 'workflow.mjs'
+    if checker.is_file():
         try:
-            result = subprocess.run(['node', 'workflow/workflow.mjs', 'metodologia'],
+            result = subprocess.run(['node', str(checker), 'metodologia'],
                                     capture_output=True, text=True, timeout=5)
             if result.stdout.strip():
                 lines.append(result.stdout.strip())
