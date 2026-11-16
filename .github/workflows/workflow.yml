@@ -1,0 +1,29 @@
+name: Workflow
+on:
+  pull_request:
+  push:
+    branches: [development]
+permissions:
+  contents: read
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        node: ['22', '24']
+    env:
+      WORKFLOW_BASE: ${{ github.event.pull_request.base.sha || 'development' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      # Añadir aquí la instalación reproducible de dependencias del proyecto, si la necesita.
+      # No usar pull_request_target, runners propios ni secretos para ejecutar código de un PR.
+      - name: Comprobar contrato, secretos, gates y tamaño
+        run: node workflow/workflow.mjs todo

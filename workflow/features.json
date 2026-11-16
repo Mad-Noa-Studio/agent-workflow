@@ -1,0 +1,10 @@
+{
+  "contrato": 1,
+  "proyecto": "agent-workflow",
+  "gates": {
+    "check": "node --test test/*.test.mjs",
+    "max_rondas_ci": 2,
+    "max_lineas_pr": 400
+  },
+  "features": []
+}

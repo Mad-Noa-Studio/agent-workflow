@@ -1,0 +1,10 @@
+{
+  "contrato": 1,
+  "proyecto": "",
+  "gates": {
+    "check": "npm test",
+    "max_rondas_ci": 2,
+    "max_lineas_pr": 400
+  },
+  "features": []
+}
