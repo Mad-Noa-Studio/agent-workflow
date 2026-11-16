@@ -13,7 +13,7 @@ jobs:
       matrix:
         node: ['22', '24']
     env:
-      WORKFLOW_BASE: ${{ github.event.pull_request.base.sha || 'development' }}
+      WORKFLOW_BASE: ${{ github.event.pull_request.base.sha || github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
